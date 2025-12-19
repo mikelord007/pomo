@@ -30,7 +30,10 @@ export function RecoveryRateChart({ data }: RecoveryRateChartProps) {
             border: '1px solid #e5e7eb',
             borderRadius: '4px',
           }}
-          formatter={(value: number) => [`${value.toFixed(1)}%`, 'Recovery Rate']}
+          formatter={(value: number | undefined) => {
+            if (value === undefined) return ['0%', 'Recovery Rate'];
+            return [`${value.toFixed(1)}%`, 'Recovery Rate'];
+          }}
         />
         <Line
           type="monotone"
