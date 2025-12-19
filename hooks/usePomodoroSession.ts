@@ -28,6 +28,44 @@ export function usePomodoroSession(): UsePomodoroSessionReturn {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const savedRef = useRef(false);
 
+  // Play notification sound
+  const playNotificationSound = useCallback(() => {
+    try {
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      // Pleasant notification tone (two beeps)
+      oscillator.frequency.value = 800;
+      oscillator.type = 'sine';
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.3);
+
+      // Second beep after a short delay
+      setTimeout(() => {
+        const oscillator2 = audioContext.createOscillator();
+        const gainNode2 = audioContext.createGain();
+        oscillator2.connect(gainNode2);
+        gainNode2.connect(audioContext.destination);
+        oscillator2.frequency.value = 800;
+        oscillator2.type = 'sine';
+        gainNode2.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+        oscillator2.start(audioContext.currentTime);
+        oscillator2.stop(audioContext.currentTime + 0.3);
+      }, 400);
+    } catch (error) {
+      // Fallback: try using HTML5 audio if Web Audio API fails
+      console.error('Error playing notification sound:', error);
+    }
+  }, []);
+
   // Timer countdown
   useEffect(() => {
     if (sessionState === 'running' && timeRemaining > 0) {
@@ -53,6 +91,13 @@ export function usePomodoroSession(): UsePomodoroSessionReturn {
       }
     };
   }, [sessionState, timeRemaining]);
+
+  // Play sound when timer completes
+  useEffect(() => {
+    if (sessionState === 'completed') {
+      playNotificationSound();
+    }
+  }, [sessionState, playNotificationSound]);
 
   const startSession = useCallback(() => {
     setStartTime(new Date());
