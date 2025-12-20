@@ -23,6 +23,7 @@ interface UsePomodoroSessionReturn {
 export function usePomodoroSession(): UsePomodoroSessionReturn {
   const [timeRemaining, setTimeRemaining] = useState(POMODORO_DURATION);
   const [distractionCount, setDistractionCount] = useState(0);
+  const [distractionTimestamps, setDistractionTimestamps] = useState<string[]>([]);
   const [sessionState, setSessionState] = useState<SessionState>('idle');
   const [startTime, setStartTime] = useState<Date | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -103,6 +104,7 @@ export function usePomodoroSession(): UsePomodoroSessionReturn {
     setStartTime(new Date());
     setTimeRemaining(POMODORO_DURATION);
     setDistractionCount(0);
+    setDistractionTimestamps([]);
     setSessionState('running');
     savedRef.current = false;
   }, []);
@@ -110,6 +112,7 @@ export function usePomodoroSession(): UsePomodoroSessionReturn {
   const logDistraction = useCallback(() => {
     if (sessionState === 'running') {
       setDistractionCount((prev) => prev + 1);
+      setDistractionTimestamps((prev) => [...prev, new Date().toISOString()]);
     }
   }, [sessionState]);
 
@@ -125,12 +128,13 @@ export function usePomodoroSession(): UsePomodoroSessionReturn {
           end_time: endTime.toISOString(),
           status: 'abandoned',
           distraction_count: distractionCount,
+          distraction_timestamps: distractionTimestamps.length > 0 ? distractionTimestamps : null,
         });
       } catch (error) {
         console.error('Error saving abandoned session:', error);
       }
     }
-  }, [sessionState, startTime, distractionCount]);
+  }, [sessionState, startTime, distractionCount, distractionTimestamps]);
 
   const finishSession = useCallback(async () => {
     if (sessionState === 'running' && startTime && !savedRef.current) {
@@ -145,19 +149,20 @@ export function usePomodoroSession(): UsePomodoroSessionReturn {
           end_time: endTime.toISOString(),
           status: 'clean',
           distraction_count: distractionCount,
+          distraction_timestamps: distractionTimestamps.length > 0 ? distractionTimestamps : null,
         });
       } catch (error) {
         console.error('Error saving finished session:', error);
       }
     }
-  }, [sessionState, startTime, distractionCount]);
+  }, [sessionState, startTime, distractionCount, distractionTimestamps]);
 
   const endSession = useCallback(async () => {
     if (sessionState === 'completed' && startTime && !savedRef.current) {
       savedRef.current = true;
       const endTime = new Date();
-      // Determine status: clean if no distractions, recovered if distractions occurred
-      const status: SessionStatus = distractionCount > 0 ? 'recovered' : 'clean';
+      // All completed sessions are marked as 'clean'
+      const status: SessionStatus = 'clean';
 
       try {
         await supabase.from('pomodoro_sessions').insert({
@@ -165,16 +170,18 @@ export function usePomodoroSession(): UsePomodoroSessionReturn {
           end_time: endTime.toISOString(),
           status,
           distraction_count: distractionCount,
+          distraction_timestamps: distractionTimestamps.length > 0 ? distractionTimestamps : null,
         });
       } catch (error) {
         console.error('Error saving session:', error);
       }
     }
-  }, [sessionState, startTime, distractionCount]);
+  }, [sessionState, startTime, distractionCount, distractionTimestamps]);
 
   const resetSession = useCallback(() => {
     setTimeRemaining(POMODORO_DURATION);
     setDistractionCount(0);
+    setDistractionTimestamps([]);
     setSessionState('idle');
     setStartTime(null);
     savedRef.current = false;

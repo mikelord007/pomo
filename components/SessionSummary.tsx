@@ -11,13 +11,11 @@ interface SessionSummaryProps {
 export function SessionSummary({ status, distractionCount, onClose }: SessionSummaryProps) {
   const statusLabels = {
     clean: 'Clean Session',
-    recovered: 'Recovered Session',
     abandoned: 'Abandoned Session',
   };
 
   const statusDescriptions = {
-    clean: 'You completed the session without distractions.',
-    recovered: `You noticed ${distractionCount} distraction${distractionCount !== 1 ? 's' : ''} and returned to focus.`,
+    clean: `You completed the session${distractionCount > 0 ? ` with ${distractionCount} distraction${distractionCount !== 1 ? 's' : ''}` : ' without distractions'}.`,
     abandoned: 'The session was abandoned.',
   };
 

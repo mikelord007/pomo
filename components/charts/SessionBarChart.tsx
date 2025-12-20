@@ -11,7 +11,6 @@ export function SessionBarChart({ data }: SessionBarChartProps) {
   const chartData = data.map((day) => ({
     date: new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
     Clean: day.cleanSessions,
-    Recovered: day.recoveredSessions,
     Abandoned: day.abandonedSessions,
   }));
 
@@ -26,11 +25,19 @@ export function SessionBarChart({ data }: SessionBarChartProps) {
             backgroundColor: '#fff',
             border: '1px solid #e5e7eb',
             borderRadius: '4px',
+            color: '#111827',
+          }}
+          labelStyle={{
+            color: '#111827',
+            fontWeight: 500,
+          }}
+          itemStyle={{
+            color: '#1f2937',
+            fontWeight: 500,
           }}
         />
         <Legend />
         <Bar dataKey="Clean" fill="#4b5563" />
-        <Bar dataKey="Recovered" fill="#6b7280" />
         <Bar dataKey="Abandoned" fill="#9ca3af" />
       </BarChart>
     </ResponsiveContainer>

@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { useMetrics } from '@/hooks/useMetrics';
 import { SessionBarChart } from '@/components/charts/SessionBarChart';
 import { DistractionLineChart } from '@/components/charts/DistractionLineChart';
-import { RecoveryRateChart } from '@/components/charts/RecoveryRateChart';
+import { DistractionsPerHourChart } from '@/components/charts/DistractionsPerHourChart';
+import { FocusTimeChart } from '@/components/charts/FocusTimeChart';
 
 export default function MetricsPage() {
   const { metrics, loading, error } = useMetrics();
@@ -29,8 +30,12 @@ export default function MetricsPage() {
     );
   }
 
-  const formatPercentage = (value: number) => `${(value * 100).toFixed(1)}%`;
   const formatNumber = (value: number) => value.toFixed(1);
+  const formatTime = (minutes: number) => {
+    const hours = Math.floor(minutes / 60);
+    const mins = Math.round(minutes % 60);
+    return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+  };
 
   return (
     <main className="min-h-screen p-8">
@@ -60,20 +65,20 @@ export default function MetricsPage() {
                   <span className="font-medium">{metrics.today.cleanSessions}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Recovered:</span>
-                  <span className="font-medium">{metrics.today.recoveredSessions}</span>
-                </div>
-                <div className="flex justify-between">
                   <span className="text-gray-600">Abandoned:</span>
                   <span className="font-medium text-gray-400">{metrics.today.abandonedSessions}</span>
                 </div>
                 <div className="flex justify-between pt-2 border-t border-foreground/10">
-                  <span className="text-gray-600">Avg Distractions:</span>
-                  <span className="font-medium">{formatNumber(metrics.today.averageDistractions)}</span>
+                  <span className="text-gray-600">Focus Time:</span>
+                  <span className="font-medium">{formatTime(metrics.today.totalFocusTimeMinutes)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Recovery Rate:</span>
-                  <span className="font-medium">{formatPercentage(metrics.today.recoveryRate)}</span>
+                  <span className="text-gray-600">Distractions/Hour:</span>
+                  <span className="font-medium">{formatNumber(metrics.today.distractionsPerHour)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Avg Distractions:</span>
+                  <span className="font-medium">{formatNumber(metrics.today.averageDistractions)}</span>
                 </div>
               </div>
             ) : (
@@ -94,20 +99,20 @@ export default function MetricsPage() {
                   <span className="font-medium">{metrics.yesterday.cleanSessions}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Recovered:</span>
-                  <span className="font-medium">{metrics.yesterday.recoveredSessions}</span>
-                </div>
-                <div className="flex justify-between">
                   <span className="text-gray-600">Abandoned:</span>
                   <span className="font-medium text-gray-400">{metrics.yesterday.abandonedSessions}</span>
                 </div>
                 <div className="flex justify-between pt-2 border-t border-foreground/10">
-                  <span className="text-gray-600">Avg Distractions:</span>
-                  <span className="font-medium">{formatNumber(metrics.yesterday.averageDistractions)}</span>
+                  <span className="text-gray-600">Focus Time:</span>
+                  <span className="font-medium">{formatTime(metrics.yesterday.totalFocusTimeMinutes)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Recovery Rate:</span>
-                  <span className="font-medium">{formatPercentage(metrics.yesterday.recoveryRate)}</span>
+                  <span className="text-gray-600">Distractions/Hour:</span>
+                  <span className="font-medium">{formatNumber(metrics.yesterday.distractionsPerHour)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Avg Distractions:</span>
+                  <span className="font-medium">{formatNumber(metrics.yesterday.averageDistractions)}</span>
                 </div>
               </div>
             ) : (
@@ -133,15 +138,15 @@ export default function MetricsPage() {
               </div>
             </div>
             <div>
-              <div className="text-gray-600 mb-1">Recovered Sessions</div>
-              <div className="text-2xl font-light">
-                {metrics.last7Days.reduce((sum, day) => sum + day.recoveredSessions, 0)}
-              </div>
-            </div>
-            <div>
               <div className="text-gray-600 mb-1">Abandoned Sessions</div>
               <div className="text-2xl font-light text-gray-400">
                 {metrics.last7Days.reduce((sum, day) => sum + day.abandonedSessions, 0)}
+              </div>
+            </div>
+            <div>
+              <div className="text-gray-600 mb-1">Total Focus Time</div>
+              <div className="text-2xl font-light">
+                {formatTime(metrics.last7Days.reduce((sum, day) => sum + day.totalFocusTimeMinutes, 0))}
               </div>
             </div>
           </div>
@@ -150,8 +155,13 @@ export default function MetricsPage() {
         {/* Charts */}
         <div className="space-y-12">
           <div className="border border-foreground/10 rounded-lg p-6">
-            <h2 className="text-lg font-medium mb-4">Sessions by Type (Last 7 Days)</h2>
-            <SessionBarChart data={metrics.last7Days} />
+            <h2 className="text-lg font-medium mb-4">Time Spent Focusing (Last 7 Days)</h2>
+            <FocusTimeChart data={metrics.last7Days} />
+          </div>
+
+          <div className="border border-foreground/10 rounded-lg p-6">
+            <h2 className="text-lg font-medium mb-4">Distractions per Hour (Last 7 Days)</h2>
+            <DistractionsPerHourChart data={metrics.last7Days} />
           </div>
 
           <div className="border border-foreground/10 rounded-lg p-6">
@@ -160,8 +170,8 @@ export default function MetricsPage() {
           </div>
 
           <div className="border border-foreground/10 rounded-lg p-6">
-            <h2 className="text-lg font-medium mb-4">Recovery Rate Trend</h2>
-            <RecoveryRateChart data={metrics.last7Days} />
+            <h2 className="text-lg font-medium mb-4">Sessions by Type (Last 7 Days)</h2>
+            <SessionBarChart data={metrics.last7Days} />
           </div>
         </div>
       </div>

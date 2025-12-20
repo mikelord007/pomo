@@ -61,10 +61,7 @@ export default function Home() {
   };
 
   const showSummary = sessionState === 'completed' || sessionState === 'abandoned' || sessionState === 'finished';
-  const summaryStatus = 
-    sessionState === 'abandoned' ? 'abandoned' : 
-    sessionState === 'finished' ? 'clean' : 
-    (distractionCount > 0 ? 'recovered' : 'clean');
+  const summaryStatus = sessionState === 'abandoned' ? 'abandoned' : 'clean';
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-8">

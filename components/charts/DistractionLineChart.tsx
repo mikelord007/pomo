@@ -25,6 +25,15 @@ export function DistractionLineChart({ data }: DistractionLineChartProps) {
             backgroundColor: '#fff',
             border: '1px solid #e5e7eb',
             borderRadius: '4px',
+            color: '#111827',
+          }}
+          labelStyle={{
+            color: '#111827',
+            fontWeight: 500,
+          }}
+          itemStyle={{
+            color: '#1f2937',
+            fontWeight: 500,
           }}
         />
         <Line

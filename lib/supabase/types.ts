@@ -1,5 +1,5 @@
 // Database types matching Supabase schema
-export type SessionStatus = 'clean' | 'recovered' | 'abandoned';
+export type SessionStatus = 'clean' | 'abandoned';
 
 export interface Database {
   public: {
@@ -11,6 +11,7 @@ export interface Database {
           end_time: string | null;
           status: SessionStatus;
           distraction_count: number;
+          distraction_timestamps: string[] | null;
           created_at: string;
         };
         Insert: {
@@ -19,6 +20,7 @@ export interface Database {
           end_time?: string | null;
           status: SessionStatus;
           distraction_count?: number;
+          distraction_timestamps?: string[] | null;
           created_at?: string;
         };
         Update: {
@@ -27,6 +29,7 @@ export interface Database {
           end_time?: string | null;
           status?: SessionStatus;
           distraction_count?: number;
+          distraction_timestamps?: string[] | null;
           created_at?: string;
         };
       };
