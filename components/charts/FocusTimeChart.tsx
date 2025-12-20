@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import type { DailyMetrics } from '@/hooks/useMetrics';
 import type { PomodoroSession } from '@/types/session';
@@ -39,8 +40,8 @@ function CustomBar(props: any) {
     return sum;
   }, 0);
 
-  const dividers: JSX.Element[] = [];
-  const distractionLines: JSX.Element[] = [];
+  const dividers: React.ReactElement[] = [];
+  const distractionLines: React.ReactElement[] = [];
   
   let cumulativeMinutes = 0;
   
