@@ -24,3 +24,28 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Remove focus outline from chart elements */
+.recharts-wrapper,
+.recharts-wrapper:focus,
+.recharts-wrapper:focus-visible {
+  outline: none !important;
+}
+
+.recharts-wrapper svg,
+.recharts-wrapper svg:focus,
+.recharts-wrapper svg:focus-visible {
+  outline: none !important;
+}
+
+.recharts-wrapper line,
+.recharts-wrapper line:focus,
+.recharts-wrapper line:focus-visible,
+.recharts-wrapper rect,
+.recharts-wrapper rect:focus,
+.recharts-wrapper rect:focus-visible,
+.recharts-wrapper g,
+.recharts-wrapper g:focus,
+.recharts-wrapper g:focus-visible {
+  outline: none !important;
+}

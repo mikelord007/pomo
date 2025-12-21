@@ -134,7 +134,7 @@ export function FocusTimeChart({ data }: FocusTimeChartProps) {
   };
 
   return (
-    <ResponsiveContainer width="100%" height={300}>
+    <ResponsiveContainer width="100%" height={300} style={{ outline: 'none' }}>
       <BarChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
         <XAxis dataKey="date" stroke="#6b7280" />
